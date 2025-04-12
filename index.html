@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1976d2">
+  <title>Dokumen Titik Nol Proyek</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f1f1f1;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    h2 {
+      text-align: center;
+      color: #1976d2;
+    }
+    input, textarea, button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #1976d2;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Dokumen Titik Nol Proyek</h2>
+    <input type="file" id="imageInput" accept="image/*" />
+    <textarea id="keterangan" placeholder="Masukkan keterangan lokasi..."></textarea>
+    <button onclick="ambilLokasi()">Ambil Lokasi</button>
+    <div id="lokasi"></div>
+    <button onclick="shareData()">Bagikan via WhatsApp</button>
+  </div>  <script>
+    let latitude = null;
+    let longitude = null;
+
+    function ambilLokasi() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          latitude = pos.coords.latitude;
+          longitude = pos.coords.longitude;
+          document.getElementById("lokasi").innerText = `Lokasi: ${latitude}, ${longitude}`;
+        }, () => {
+          alert("Gagal mengambil lokasi. Aktifkan GPS Anda.");
+        });
+      } else {
+        alert("Geolocation tidak didukung oleh browser Anda.");
+      }
+    }
+
+    function shareData() {
+      const keterangan = document.getElementById("keterangan").value;
+      const image = document.getElementById("imageInput").files[0];
+      if (!latitude || !longitude || !keterangan || !image) {
+        alert("Isi semua data terlebih dahulu.");
+        return;
+      }
+      const lokasiLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+      const pesan = `*Dokumen Titik Nol Proyek*
+${keterangan}
+Lokasi: ${lokasiLink}`;
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(pesan)}`;
+      window.open(whatsappUrl, '_blank');
+    }
+
+    // PWA install
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(function(reg) {
+        console.log('Service Worker terdaftar', reg);
+      });
+    }
+  </script></body>
+</html>
